@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hockey Timer</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #f0f4f8;
+        text-align: center;
+      }
+
+      .timer,
+      .penalty {
+        background: #fff;
+        padding: 1rem;
+        margin: 0% auto;
+        max-width: 600px;
+      }
+
+      .time-display {
+        font-size: 13rem;
+        font-weight: bold;
+      }
+
+      .period-select {
+        font-size: 1rem;
+        margin: 1rem 0;
+      }
+
+      select {
+        font-size: 1rem;
+        padding: 0.3rem;
+      }
+
+      button {
+        margin: 0.3rem;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      strong {
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="timer">
+      <div class="time-display" id="matchTime">15:00</div>
+
+      <div class="period-select">
+        Period:
+        <select id="periodSelect" onchange="changePeriod()">
+          <option value="1">1st</option>
+          <option value="2">2nd</option>
+          <option value="3">3rd</option>
+          <option value="4">4th</option>
+        </select>
+      </div>
+
+      <div class="controls">
+        <button onclick="toggleMatchTimer()">
+          <span id="matchToggle">Start</span> Match Timer
+        </button>
+        <button onclick="resetMatch()">Reset</button>
+      </div>
+    </div>
+
+    <div class="penalty">
+      <div><strong>Penalty Corner Countdown</strong></div>
+      <div class="time-display" id="penaltyTime">40</div>
+      <div class="controls">
+        <button onclick="startPenalty()">Start 40s</button>
+        <button onclick="stopPenalty()">Stop</button>
+        <button onclick="resetPenalty()">Reset</button>
+      </div>
+    </div>
+
+    <script>
+      // Match Timer Logic
+      let matchSeconds = 15 * 60;
+      let matchInterval = null;
+      let matchRunning = false;
+
+      function updateMatchDisplay() {
+        const mins = String(Math.floor(matchSeconds / 60)).padStart(2, "0");
+        const secs = String(matchSeconds % 60).padStart(2, "0");
+        document.getElementById("matchTime").textContent = `${mins}:${secs}`;
+      }
+
+      function toggleMatchTimer() {
+        if (matchRunning) {
+          clearInterval(matchInterval);
+          matchRunning = false;
+          document.getElementById("matchToggle").textContent = "Start";
+        } else {
+          matchInterval = setInterval(() => {
+            if (matchSeconds > 0) {
+              matchSeconds--;
+            } else {
+              clearInterval(matchInterval);
+              matchRunning = false;
+              alert("End of selected period!");
+            }
+            updateMatchDisplay();
+          }, 1000);
+          matchRunning = true;
+          document.getElementById("matchToggle").textContent = "Pause";
+        }
+      }
+
+      function resetMatch() {
+        clearInterval(matchInterval);
+        matchSeconds = 15 * 60;
+        matchRunning = false;
+        document.getElementById("matchToggle").textContent = "Start";
+        updateMatchDisplay();
+      }
+
+      function changePeriod() {
+        resetMatch();
+      }
+
+      updateMatchDisplay();
+
+      // Penalty Timer Logic
+      let penaltySeconds = 40;
+      let penaltyInterval = null;
+
+      function updatePenaltyDisplay() {
+        document.getElementById("penaltyTime").textContent = penaltySeconds;
+      }
+
+      function startPenalty() {
+        clearInterval(penaltyInterval);
+        penaltyInterval = setInterval(() => {
+          if (penaltySeconds > 0) {
+            penaltySeconds--;
+            updatePenaltyDisplay();
+          } else {
+            clearInterval(penaltyInterval);
+            alert("Penalty corner time is up!");
+          }
+        }, 1000);
+      }
+
+      function stopPenalty() {
+        clearInterval(penaltyInterval);
+      }
+
+      function resetPenalty() {
+        clearInterval(penaltyInterval);
+        penaltySeconds = 40;
+        updatePenaltyDisplay();
+      }
+
+      updatePenaltyDisplay();
+    </script>
+  </body>
+</html>
